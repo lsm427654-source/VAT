@@ -24,6 +24,17 @@ description: Test-Driven Development (TDD) guidelines for core business logic
 ### 3. 🔵 Refactor (리팩토링)
 테스트 통과를 유지하면서 코드 개선
 
+## 테스트 커버리지 목표
+
+- **코어 로직** (`src/core/`): **100%** (모든 분기 커버)
+  - 순수 함수, 외부 의존성 없음, 달성 용이
+- **서비스 레이어** (`src/services/`): **90% 이상**
+  - 브라우저 API 모킹 필요, 일부 예외 허용
+- **UI 컨트롤러** (`src/ui/controllers/`): **80% 이상**
+  - 통합 테스트로 커버
+- **UI 컴포넌트** (`src/ui/components/`): **수동 테스트**
+  - 브라우저에서 직접 확인
+
 ## 중요 원칙
 
 1. **테스트를 먼저 작성한다** - 구현 전에 항상 테스트 작성

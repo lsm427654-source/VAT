@@ -221,197 +221,199 @@
     </div>
 
     <script>
-        // State
-        let currentInput = '0';
-        let currentMode = 'inclusive'; // 'inclusive' or 'exclusive'
-        const VAT_RATE = 0.1;
-        const MAX_DIGITS = 12;
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // State
+            let currentInput = '0';
+            let currentMode = 'inclusive'; // 'inclusive' or 'exclusive'
+            const VAT_RATE = 0.1;
+            const MAX_DIGITS = 12;
 
-        // DOM Elements
-        const inputAmountEl = document.getElementById('inputAmount');
-        const supplyAmountEl = document.getElementById('supplyAmount');
-        const vatAmountEl = document.getElementById('vatAmount');
-        const totalAmountEl = document.getElementById('totalAmount');
-        const modeInclusiveEl = document.getElementById('modeInclusive');
-        const modeExclusiveEl = document.getElementById('modeExclusive');
-        const resetBtn = document.getElementById('resetBtn');
-        const copyBtn = document.getElementById('copyBtn');
-        const backspaceBtn = document.getElementById('backspaceBtn');
-        const keypadBtns = document.querySelectorAll('.keypad-btn');
-        const toastEl = document.getElementById('toast');
+            // DOM Elements
+            const inputAmountEl = document.getElementById('inputAmount');
+            const supplyAmountEl = document.getElementById('supplyAmount');
+            const vatAmountEl = document.getElementById('vatAmount');
+            const totalAmountEl = document.getElementById('totalAmount');
+            const modeInclusiveEl = document.getElementById('modeInclusive');
+            const modeExclusiveEl = document.getElementById('modeExclusive');
+            const resetBtn = document.getElementById('resetBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const backspaceBtn = document.getElementById('backspaceBtn');
+            const keypadBtns = document.querySelectorAll('.keypad-btn');
+            const toastEl = document.getElementById('toast');
 
-        // Format number with commas
-        function formatNumber(num) {
-            return Math.round(num).toLocaleString('ko-KR');
-        }
-
-        // Calculate VAT
-        function calculate() {
-            const inputValue = parseInt(currentInput) || 0;
-            let supply, vat, total;
-
-            if (currentMode === 'inclusive') {
-                // 부가세 포함: 총액에서 역산
-                total = inputValue;
-                supply = Math.round(total / 1.1);
-                vat = total - supply;
-            } else {
-                // 부가세 별도: 공급가액에서 계산
-                supply = inputValue;
-                vat = Math.round(supply * VAT_RATE);
-                total = supply + vat;
+            // Format number with commas
+            function formatNumber(num) {
+                return Math.round(num).toLocaleString('ko-KR');
             }
 
-            // Update display
-            inputAmountEl.textContent = formatNumber(inputValue);
-            supplyAmountEl.textContent = formatNumber(supply) + '원';
-            vatAmountEl.textContent = formatNumber(vat) + '원';
-            totalAmountEl.textContent = formatNumber(total) + '원';
-        }
+            // Calculate VAT
+            function calculate() {
+                const inputValue = parseInt(currentInput) || 0;
+                let supply, vat, total;
 
-        // Handle number input
-        function inputNumber(value) {
-            if (currentInput === '0') {
-                currentInput = value;
-            } else {
-                const newInput = currentInput + value;
-                if (newInput.length <= MAX_DIGITS) {
-                    currentInput = newInput;
+                if (currentMode === 'inclusive') {
+                    // 부가세 포함: 총액에서 역산
+                    total = inputValue;
+                    supply = Math.round(total / 1.1);
+                    vat = total - supply;
+                } else {
+                    // 부가세 별도: 공급가액에서 계산
+                    supply = inputValue;
+                    vat = Math.round(supply * VAT_RATE);
+                    total = supply + vat;
                 }
-            }
-            calculate();
-        }
 
-        // Handle backspace
-        function handleBackspace() {
-            if (currentInput.length > 1) {
-                currentInput = currentInput.slice(0, -1);
-            } else {
+                // Update display
+                inputAmountEl.textContent = formatNumber(inputValue);
+                supplyAmountEl.textContent = formatNumber(supply) + '원';
+                vatAmountEl.textContent = formatNumber(vat) + '원';
+                totalAmountEl.textContent = formatNumber(total) + '원';
+            }
+
+            // Handle number input
+            function inputNumber(value) {
+                if (currentInput === '0') {
+                    currentInput = value;
+                } else {
+                    const newInput = currentInput + value;
+                    if (newInput.length <= MAX_DIGITS) {
+                        currentInput = newInput;
+                    }
+                }
+                calculate();
+            }
+
+            // Handle backspace
+            function handleBackspace() {
+                if (currentInput.length > 1) {
+                    currentInput = currentInput.slice(0, -1);
+                } else {
+                    currentInput = '0';
+                }
+                calculate();
+            }
+
+            // Handle reset
+            function handleReset() {
                 currentInput = '0';
-            }
-            calculate();
-        }
-
-        // Handle reset
-        function handleReset() {
-            currentInput = '0';
-            calculate();
-        }
-
-        // Handle copy
-        function handleCopy() {
-            const inputValue = parseInt(currentInput) || 0;
-            let supply, vat, total;
-
-            if (currentMode === 'inclusive') {
-                total = inputValue;
-                supply = Math.round(total / 1.1);
-                vat = total - supply;
-            } else {
-                supply = inputValue;
-                vat = Math.round(supply * VAT_RATE);
-                total = supply + vat;
+                calculate();
             }
 
-            const modeText = currentMode === 'inclusive' ? '부가세 포함' : '부가세 별도';
-            const copyText = `[${modeText}]
+            // Handle copy
+            function handleCopy() {
+                const inputValue = parseInt(currentInput) || 0;
+                let supply, vat, total;
+
+                if (currentMode === 'inclusive') {
+                    total = inputValue;
+                    supply = Math.round(total / 1.1);
+                    vat = total - supply;
+                } else {
+                    supply = inputValue;
+                    vat = Math.round(supply * VAT_RATE);
+                    total = supply + vat;
+                }
+
+                const modeText = currentMode === 'inclusive' ? '부가세 포함' : '부가세 별도';
+                const copyText = `[${modeText}]
 입력 금액: ${formatNumber(inputValue)}원
 공급가액: ${formatNumber(supply)}원
 부가세(10%): ${formatNumber(vat)}원
 합계금액: ${formatNumber(total)}원`;
 
-            navigator.clipboard.writeText(copyText).then(() => {
-                showToast();
-            }).catch(err => {
-                console.error('복사 실패:', err);
+                navigator.clipboard.writeText(copyText).then(() => {
+                    showToast();
+                }).catch(err => {
+                    console.error('복사 실패:', err);
+                });
+            }
+
+            // Show toast notification
+            function showToast() {
+                toastEl.classList.remove('opacity-0');
+                toastEl.classList.add('opacity-100');
+                setTimeout(() => {
+                    toastEl.classList.remove('opacity-100');
+                    toastEl.classList.add('opacity-0');
+                }, 2000);
+            }
+
+            // Handle mode change
+            function handleModeChange() {
+                currentMode = modeInclusiveEl.checked ? 'inclusive' : 'exclusive';
+                calculate();
+            }
+
+            // Trigger button animation
+            function animateButton(button) {
+                button.classList.add('keyboard-press');
+                setTimeout(() => {
+                    button.classList.remove('keyboard-press');
+                }, 150);
+            }
+
+            // Event Listeners - Keypad
+            console.log('Keypad buttons found:', keypadBtns.length);
+            keypadBtns.forEach((btn, index) => {
+                console.log(`Button ${index}:`, btn.textContent, 'data-value:', btn.dataset.value);
+                btn.addEventListener('click', () => {
+                    console.log('Button clicked:', btn.dataset.value);
+                    inputNumber(btn.dataset.value);
+                });
             });
-        }
 
-        // Show toast notification
-        function showToast() {
-            toastEl.classList.remove('opacity-0');
-            toastEl.classList.add('opacity-100');
-            setTimeout(() => {
-                toastEl.classList.remove('opacity-100');
-                toastEl.classList.add('opacity-0');
-            }, 2000);
-        }
+            backspaceBtn.addEventListener('click', handleBackspace);
+            resetBtn.addEventListener('click', handleReset);
+            copyBtn.addEventListener('click', handleCopy);
+            modeInclusiveEl.addEventListener('change', handleModeChange);
+            modeExclusiveEl.addEventListener('change', handleModeChange);
 
-        // Handle mode change
-        function handleModeChange() {
-            currentMode = modeInclusiveEl.checked ? 'inclusive' : 'exclusive';
-            calculate();
-        }
-
-        // Trigger button animation
-        function animateButton(button) {
-            button.classList.add('keyboard-press');
-            setTimeout(() => {
-                button.classList.remove('keyboard-press');
-            }, 150);
-        }
-
-        // Event Listeners - Keypad
-        console.log('Keypad buttons found:', keypadBtns.length);
-        keypadBtns.forEach((btn, index) => {
-            console.log(`Button ${index}:`, btn.textContent, 'data-value:', btn.dataset.value);
-            btn.addEventListener('click', () => {
-                console.log('Button clicked:', btn.dataset.value);
-                inputNumber(btn.dataset.value);
-            });
-        });
-
-        backspaceBtn.addEventListener('click', handleBackspace);
-        resetBtn.addEventListener('click', handleReset);
-        copyBtn.addEventListener('click', handleCopy);
-        modeInclusiveEl.addEventListener('change', handleModeChange);
-        modeExclusiveEl.addEventListener('change', handleModeChange);
-
-        // Event Listeners - Keyboard
-        document.addEventListener('keydown', (e) => {
-            // Prevent default for keys we handle
-            if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'Delete', 'Enter', 'Escape', 'Tab'].includes(e.key)) {
-                e.preventDefault();
-            }
-
-            // Number keys
-            if (e.key >= '0' && e.key <= '9') {
-                inputNumber(e.key);
-                const btn = Array.from(keypadBtns).find(b => b.dataset.value === e.key);
-                if (btn) animateButton(btn);
-            }
-
-            // Backspace/Delete
-            if (e.key === 'Backspace' || e.key === 'Delete') {
-                handleBackspace();
-                animateButton(backspaceBtn);
-            }
-
-            // Enter - Copy
-            if (e.key === 'Enter') {
-                handleCopy();
-                animateButton(copyBtn);
-            }
-
-            // Escape - Reset
-            if (e.key === 'Escape') {
-                handleReset();
-                animateButton(resetBtn);
-            }
-
-            // Tab - Toggle mode
-            if (e.key === 'Tab') {
-                if (currentMode === 'inclusive') {
-                    modeExclusiveEl.checked = true;
-                } else {
-                    modeInclusiveEl.checked = true;
+            // Event Listeners - Keyboard
+            document.addEventListener('keydown', (e) => {
+                // Prevent default for keys we handle
+                if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Backspace', 'Delete', 'Enter', 'Escape', 'Tab'].includes(e.key)) {
+                    e.preventDefault();
                 }
-                handleModeChange();
-            }
-        });
 
-        // Initial calculation
-        calculate();
+                // Number keys
+                if (e.key >= '0' && e.key <= '9') {
+                    inputNumber(e.key);
+                    const btn = Array.from(keypadBtns).find(b => b.dataset.value === e.key);
+                    if (btn) animateButton(btn);
+                }
+
+                // Backspace/Delete
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    handleBackspace();
+                    animateButton(backspaceBtn);
+                }
+
+                // Enter - Copy
+                if (e.key === 'Enter') {
+                    handleCopy();
+                    animateButton(copyBtn);
+                }
+
+                // Escape - Reset
+                if (e.key === 'Escape') {
+                    handleReset();
+                    animateButton(resetBtn);
+                }
+
+                // Tab - Toggle mode
+                if (e.key === 'Tab') {
+                    if (currentMode === 'inclusive') {
+                        modeExclusiveEl.checked = true;
+                    } else {
+                        modeInclusiveEl.checked = true;
+                    }
+                    handleModeChange();
+                }
+            });
+
+            // Initial calculation
+            calculate();
     </script>
 </body>
 

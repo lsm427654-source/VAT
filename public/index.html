@@ -236,8 +236,8 @@
         const modeExclusiveEl = document.getElementById('modeExclusive');
         const resetBtn = document.getElementById('resetBtn');
         const copyBtn = document.getElementById('copyBtn');
-        const backspaceBtn = document.getElementById('backspaceBtn');
-        const keypadBtns = document.querySelectorAll('.keypad-btn');
+        const backspaceBtn = document.getElementById('backspaceBtn') || document.querySelector('[data-key="backspace"]');
+        const keypadBtns = document.querySelectorAll('[data-key]');
         const toastEl = document.getElementById('toast');
 
         // Format number with commas
@@ -354,7 +354,10 @@
         // Event Listeners - Keypad
         keypadBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                inputNumber(btn.dataset.value);
+                const key = btn.dataset.key;
+                if (key && key !== 'backspace' && key !== 'reset') {
+                    inputNumber(key);
+                }
             });
         });
 
@@ -374,7 +377,7 @@
             // Number keys
             if (e.key >= '0' && e.key <= '9') {
                 inputNumber(e.key);
-                const btn = Array.from(keypadBtns).find(b => b.dataset.value === e.key);
+                const btn = Array.from(keypadBtns).find(b => b.dataset.key === e.key);
                 if (btn) animateButton(btn);
             }
 

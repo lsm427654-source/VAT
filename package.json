@@ -1,0 +1,23 @@
+{
+  "name": "vat-calculator",
+  "version": "1.0.0",
+  "description": "한국 부가가치세(10%) 계산을 위한 모바일 우선 웹 애플리케이션",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsm427654-source/VAT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lsm427654-source/VAT/issues"
+  },
+  "homepage": "https://github.com/lsm427654-source/VAT#readme"
+}

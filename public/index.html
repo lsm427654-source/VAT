@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>부가세 계산기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-dark": "#1a232d",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .btn-press:active {
+            transform: scale(0.96);
+            transition: transform 0.1s;
+        }
+
+        .active {
+            transform: scale(0.96);
+            transition: transform 0.1s;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #374151;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 50;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-[#111418] dark:text-white overflow-hidden h-screen w-full flex flex-col">
+    <!-- Top App Bar -->
+    <header class="flex items-center justify-between px-4 py-3 shrink-0">
+        <h2 class="text-xl font-bold leading-tight tracking-tight flex-1">부가세 계산기</h2>
+        <div class="flex items-center justify-end gap-3">
+            <button
+                class="flex items-center justify-center rounded-full w-10 h-10 hover:bg-black/5 dark:hover:bg-white/10 transition-colors btn-press">
+                <span class="material-symbols-outlined text-[24px]">settings</span>
+            </button>
+            <button
+                class="flex items-center justify-center rounded-full w-10 h-10 hover:bg-black/5 dark:hover:bg-white/10 transition-colors btn-press">
+                <span class="material-symbols-outlined text-[24px]">history</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col relative w-full max-w-md mx-auto h-full">
+        <!-- Toggle & Input Section -->
+        <div class="px-4 pb-2 shrink-0">
+            <!-- Segmented Control -->
+            <div class="flex w-full p-1 bg-gray-200 dark:bg-surface-dark rounded-xl mb-6">
+                <label class="flex-1 cursor-pointer">
+                    <input checked class="peer sr-only" name="vat-mode" type="radio" value="inclusive" />
+                    <div
+                        class="w-full py-2.5 rounded-lg text-sm font-bold text-center text-gray-500 dark:text-gray-400 peer-checked:bg-primary peer-checked:text-white peer-checked:shadow-md transition-all">
+                        부가세 포함
+                    </div>
+                </label>
+                <label class="flex-1 cursor-pointer">
+                    <input class="peer sr-only" name="vat-mode" type="radio" value="exclusive" />
+                    <div
+                        class="w-full py-2.5 rounded-lg text-sm font-bold text-center text-gray-500 dark:text-gray-400 peer-checked:bg-primary peer-checked:text-white peer-checked:shadow-md transition-all">
+                        부가세 별도
+                    </div>
+                </label>
+            </div>
+
+            <!-- Input Display -->
+            <div class="text-center mb-6">
+                <p class="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1">입력 금액</p>
+                <div class="flex items-center justify-center gap-1">
+                    <span class="text-4xl md:text-5xl font-extrabold tracking-tight text-[#111418] dark:text-white"
+                        id="input-amount">0</span>
+                    <span class="text-2xl text-gray-400 dark:text-gray-500 font-medium mt-2">원</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Card -->
+        <div class="px-4 flex-1 flex flex-col min-h-0">
+            <div
+                class="bg-white dark:bg-surface-dark rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-800 flex flex-col justify-center h-auto min-h-[160px]">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">공급가액</span>
+                        <span class="text-[#111418] dark:text-white text-base font-bold tracking-wide"
+                            id="supply-amount">0원</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-primary text-sm font-bold">부가세</span>
+                            <span
+                                class="bg-primary/10 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded">10%</span>
+                        </div>
+                        <span class="text-primary text-lg font-bold tracking-wide" id="vat-amount">0원</span>
+                    </div>
+                    <div class="h-px bg-gray-100 dark:bg-gray-700 w-full my-1"></div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 text-sm font-medium">합계금액</span>
+                        <span class="text-[#111418] dark:text-white text-xl font-extrabold tracking-wide"
+                            id="total-amount">0원</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-2 gap-3 mt-5">
+                    <button
+                        class="flex items-center justify-center gap-2 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors btn-press"
+                        id="reset-btn" data-key="reset">
+                        <span class="material-symbols-outlined text-[18px]">refresh</span>
+                        초기화
+                    </button>
+                    <button
+                        class="flex items-center justify-center gap-2 h-10 rounded-lg bg-primary/10 text-primary text-sm font-bold hover:bg-primary/20 transition-colors btn-press"
+                        id="copy-btn">
+                        <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                        복사하기
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Numeric Keypad -->
+        <div class="mt-auto p-4 pb-8 bg-background-light dark:bg-background-dark shrink-0">
+            <div class="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto">
+                <!-- Row 1 -->
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="7">7</button>
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="8">8</button>
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="9">9</button>
+                <!-- Row 2 -->
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="4">4</button>
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="5">5</button>
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="6">6</button>
+                <!-- Row 3 -->
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="1">1</button>
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="2">2</button>
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="3">3</button>
+                <!-- Row 4 -->
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="00">00</button>
+                <button
+                    class="h-16 rounded-2xl bg-white dark:bg-surface-dark text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors btn-press"
+                    data-key="0">0</button>
+                <button
+                    class="h-16 rounded-2xl bg-gray-200 dark:bg-[#25303d] text-xl font-bold text-[#111418] dark:text-white shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex items-center justify-center btn-press"
+                    data-key="backspace">
+                    <span class="material-symbols-outlined">backspace</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script src="../src/app.js"></script>
+</body>
+
+</html>

@@ -7,7 +7,7 @@
 1. **[TDD (Test-Driven Development)](./TDD.md)**
    - 모든 코어 로직은 테스트 우선 작성
    - Red → Green → Refactor 사이클 준수
-   - UI 제외, 비즈니스 로직은 100% 테스트 커버리지 목표
+   - 코어 로직 100%, 서비스 90%, 컨트롤러 80% 커버리지 목표
 
 2. **[SOLID Principles](./SOLID.md)**
    - 단일 책임 원칙 (SRP)

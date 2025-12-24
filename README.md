@@ -61,9 +61,72 @@ cd VAT
 - Safari 14+
 - Edge 90+
 
+## 🧪 개발
+
+### 설치
+
+```bash
+git clone https://github.com/lsm427654-source/VAT.git
+cd VAT
+npm install
+```
+
+### 테스트 실행
+
+```bash
+# 모든 테스트 실행
+node tests/unit/core/calculator/VATCalculator.test.js
+node tests/unit/core/formatters/NumberFormatter.test.js
+node tests/unit/core/validators/InputValidator.test.js
+node tests/unit/services/CalculationService.test.js
+node tests/unit/services/ClipboardService.test.js
+```
+
+### 개발 서버
+
+브라우저에서 `public/index.html` 파일을 직접 열거나, 로컬 서버 사용:
+
+```bash
+# Python 3
+python -m http.server 8000
+
+# Node.js (http-server)
+npx http-server
+```
+
+### 프로젝트 구조
+
+```
+src/
+├── core/           # 비즈니스 로직 (TDD, 100% 커버리지)
+│   ├── calculator/ # VAT 계산 엔진
+│   ├── formatters/ # 숫자 포맷팅
+│   └── validators/ # 입력 검증
+├── services/       # 서비스 레이어 (90%+ 커버리지)
+│   ├── CalculationService.js
+│   └── ClipboardService.js
+├── ui/             # UI 레이어 (수동 테스트)
+│   ├── state/      # 상태 관리
+│   └── controllers/# 이벤트 처리
+└── app.js          # 메인 애플리케이션
+
+tests/
+└── unit/           # 단위 테스트 (32개 테스트)
+```
+
+### 테스트 커버리지
+
+- **코어 로직**: 100% (23/23 테스트)
+- **서비스 레이어**: 90%+ (9/9 테스트)
+- **UI 레이어**: 수동 테스트
+
 ## 📄 문서
 
 - [PRD (Product Requirements Document)](./PRD.md)
+- [TECH_SPEC (Technical Specification)](./TECH_SPEC.md)
+- [DIRECTORY_STRUCTURE](./DIRECTORY_STRUCTURE.md)
+- [TDD Rules](./docs/rules/TDD.md)
+- [SOLID Principles](./docs/rules/SOLID.md)
 
 ## 📝 라이선스
 
@@ -72,3 +135,4 @@ MIT License
 ## 👤 개발자
 
 lsm427654-source
+
